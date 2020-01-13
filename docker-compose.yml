@@ -1,0 +1,57 @@
+version: '2'
+services:
+  flectra:
+    image: flectrahq/flectra
+    # image: registry.gitlab.com/flectra-module/cicd-flectra-aruna:0.3.0
+    container_name: flectra
+    depends_on:
+      - mydb
+    ports:
+      - "7073:7073"
+    restart: always
+    environment:
+    - HOST=mydb
+    - USER=flectra
+    - PASSWORD=flectra
+    command: -- --dev=reload
+    volumes:
+      - ind_ext_addons:/mnt/extra-addons
+      - flectra-web-data:/var/lib/flectra
+      - flectra-addons:/usr/lib/python3/dist-packages/flectra/addons
+  mydb:
+    image: postgres:9.4
+    ports:
+      - "5444:5432"
+    environment:
+      - POSTGRES_INITDB_ARGS="--data-checksums"
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=flectra
+      - POSTGRES_USER=flectra
+    volumes:
+    - flectra-db-data:/var/lib/postgresql/data
+
+volumes:
+  flectra-web-data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/Users/ferdirn/Laib/flectra/web-data'
+  flectra-db-data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/Users/ferdirn/Laib/flectra/db-data'
+  ind_ext_addons:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/Users/ferdirn/Laib/flectra/ind_ext_addons'
+  flectra-addons:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/Users/ferdirn/Laib/flectra/flectraModule'
